@@ -43,8 +43,10 @@ Never sync anything before that yes.
    for subject rigor (organic chemistry, physics, upper-division math or CS, engineering core); add up to 0.1 for a
    lab or many high-weight exams; add up to 0.1 for a low class average if visible. Round to the nearest 0.05 and
    cap at 1.5. If there is not enough information, use 1.0.
-5. Write a file `grades.json` in the working folder: a list of objects with `id` (Canvas assignment id), `course_id`
-   (Canvas course id), `type`, `pct` (0 to 100), and `difficulty`.
+5. Write a file `grades.json` in the working folder: a list of objects with `course_id` (Canvas course id), `name`
+   (the assignment name), `id` (Canvas assignment id, only if Canvas gives one), `type`, `points_earned`,
+   `points_possible`, and `difficulty`. The script hashes the id or name on this machine to avoid counting an
+   assignment twice. It never sends the name. If Canvas does not give an assignment id, leave `id` out.
 6. Run `python3 scripts/clash.py sync --file grades.json`. Read its short output.
 7. Text the student one or two lines: Points and Mana earned, which assignment earned it (this is their own private
    message, so naming it is fine), and the game link from the output on its own line.

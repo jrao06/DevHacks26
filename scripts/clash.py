@@ -79,11 +79,23 @@ def cmd_sync(a):
     out = []
     for it in items:
         t = it.get("type", "homework")
+        # Canvas may not give an assignment id. Fall back to the name.
+        # Both are hashed here and never leave this machine.
+        ident = it.get("id") or it.get("name")
+        if not ident or it.get("course_id") is None:
+            continue
+        if "pct" in it:
+            pct = float(it["pct"])
+        elif it.get("points_possible"):
+            pct = 100.0 * float(it["points_earned"]) / float(it["points_possible"])
+        else:
+            continue
         out.append({
-            "assignment_key": salted(st["token"], it["id"]),
+            "assignment_key": salted(
+                st["token"], f"{it['course_id']}:{ident}:{it.get('points_possible', '')}"),
             "course_key": salted(st["token"], it["course_id"]),
             "type": t if t in TYPES else "homework",
-            "pct": max(0.0, min(100.0, float(it["pct"]))),
+            "pct": max(0.0, min(100.0, pct)),
             "difficulty": max(1.0, min(1.5, float(it.get("difficulty", 1.0)))),
         })
     res = call("/api/skill/grades", {"items": out}, st["token"])
