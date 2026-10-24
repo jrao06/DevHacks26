@@ -13,7 +13,7 @@ import sys
 import urllib.error
 import urllib.request
 
-HOST = "clash.example.app"  # must match network.runtime in cubbie.yaml
+HOST = "clash-server-one.vercel.app"  # must match network.runtime in cubbie.yaml
 BASE = f"https://{HOST}"
 TYPES = {"final_exam", "capstone", "test", "quiz", "homework"}
 
