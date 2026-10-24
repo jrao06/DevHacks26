@@ -106,6 +106,9 @@ without Clash set up.
 
 If Canvas or Calendar cannot be read at run time, send one line saying which one failed. Never invent an item.
 
+- If a script says the game server does not recognize the sign-in, tell the student their Clash data was reset,
+  run `python3 scripts/clash.py reset`, and repeat "Setup (first time only)" from step 1.
+
 ## Rules
 
 - The four rhythm check-ins are exempt from the quiet-hours rule below because the student chose their times. Send

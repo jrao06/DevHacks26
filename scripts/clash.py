@@ -18,6 +18,13 @@ BASE = f"https://{HOST}"
 TYPES = {"final_exam", "capstone", "test", "quiz", "homework"}
 
 
+class ServerError(Exception):
+    def __init__(self, code, msg):
+        super().__init__(msg)
+        self.code = code
+        self.msg = msg
+
+
 def state_path():
     d = os.environ.get("SKILL_DATA_DIR") or os.path.expanduser("~/.local/share/cubbie-clash")
     os.makedirs(d, exist_ok=True)
@@ -51,8 +58,7 @@ def call(path, body, token=None):
         with urllib.request.urlopen(req, timeout=30) as r:
             return json.loads(r.read().decode())
     except urllib.error.HTTPError as e:
-        msg = e.read().decode()[:200]
-        sys.exit(f"Server said {e.code}: {msg}")
+        raise ServerError(e.code, e.read().decode()[:200])
     except urllib.error.URLError as e:
         sys.exit(f"Could not reach the game server: {e.reason}")
 
@@ -110,9 +116,22 @@ def cmd_link(a):
 
 def cmd_leave(a):
     st = load_state() or sys.exit("Not set up.")
-    call("/api/skill/leave", {}, st["token"])
+    try:
+        call("/api/skill/leave", {}, st["token"])
+    except ServerError as e:
+        if e.code != 401:  # 401 means the server already forgot this player
+            raise
     os.remove(state_path())
     print("Left Clash. Game data deleted.")
+
+
+def cmd_reset(a):
+    """Clear this device's saved sign-in without calling the server."""
+    try:
+        os.remove(state_path())
+        print("Cleared the saved Clash sign-in. Run optin to set up again.")
+    except FileNotFoundError:
+        print("Nothing to clear.")
 
 
 def main():
@@ -127,8 +146,14 @@ def main():
     s.set_defaults(fn=cmd_sync)
     sub.add_parser("link").set_defaults(fn=cmd_link)
     sub.add_parser("leave").set_defaults(fn=cmd_leave)
+    sub.add_parser("reset").set_defaults(fn=cmd_reset)
     a = p.parse_args()
-    a.fn(a)
+    try:
+        a.fn(a)
+    except ServerError as e:
+        if e.code == 401:
+            sys.exit("The game server does not recognize this sign-in. Run 'reset', then set up again.")
+        sys.exit(f"Server said {e.code}: {e.msg}")
 
 
 if __name__ == "__main__":
