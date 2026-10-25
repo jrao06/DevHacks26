@@ -1,11 +1,12 @@
 ---
 name: cubbie-clash
-description: Turns the student's Canvas grades into Points and Mana for a battle game played with friends in the browser, and sets up daily and weekly rundowns of what is due and on their calendar. Use when the student says "start clash", "join clash <code>", "clash", "leave clash", "mute clash", asks about Clash points, Mana or the game link, or asks for daily or weekly reminders, a morning or evening rundown, a weekly recap or "set up my rhythm".
+description: Turns the student's Canvas grades into Points and Mana for a battle game played with friends in the browser, and sets up daily and weekly rundowns of what is due and on their calendar. Use when the student says "start clash", "join clash <code>", "clash", "leave clash", "mute clash", asks about Clash points, Mana, battles, challenges or the game link, or asks for daily or weekly reminders, a morning or evening rundown, a weekly recap or "set up my rhythm".
 ---
 
 # Cubbie Clash
 
-Every graded assignment earns Points and Mana. Mana powers attacks in a turn-based browser duel against friends.
+Every graded assignment earns Points and Mana. Mana powers attacks in a retro, turn-based browser duel against
+squadmates, like a GamePigeon game: each player takes a turn whenever they open the game.
 Friends only ever see Points, never grades. The same Skill also runs the student's daily and weekly rundowns
 (see "Daily rhythm" below). Keep every message to one or two lines, with the link on its own line.
 
@@ -49,13 +50,18 @@ Never sync anything before that yes.
    assignment twice. It never sends the name. If Canvas does not give an assignment id, leave `id` out.
 6. Run `python3 scripts/clash.py sync --file grades.json`. Read its short output.
 7. Text the student one or two lines: Points and Mana earned, which assignment earned it (this is their own private
-   message, so naming it is fine), and the game link from the output on its own line.
+   message, so naming it is fine), and the game link from the output on its own line. If the output has a "Battles"
+   line, add one short line saying what is waiting (a challenge, or their turn), since Cubbie cannot ping friends
+   and this text is how the student finds out.
 
 If nothing new was graded, send nothing.
 
 ## Other requests
 
-- "clash" or "game link": run `python3 scripts/clash.py link` and send the link on its own line.
+- "clash" or "game link": run `python3 scripts/clash.py link` and send the link on its own line, with a short line
+  about any "Battles" output (challenges waiting, their turn).
+- "challenge <friend>" or "battle": the student picks a squadmate and starts the duel inside the game. Send the game
+  link. Do not message the friend. If the student wants to nudge them, draft it and let the student send it.
 - "leave clash": confirm with the student first. After a yes, run `python3 scripts/clash.py leave`, which deletes
   their game data on the server.
 - "mute clash": stop sending Clash messages for 24 hours and cancel nothing else. Remember the mute end time.

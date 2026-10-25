@@ -78,6 +78,18 @@ def cmd_optin(a):
     print(res["link"])
 
 
+def battles_line(res):
+    """One line about waiting challenges and turns, so Cubbie can mention it in the student's text."""
+    b = res.get("battles") or {}
+    bits = []
+    if b.get("invites"):
+        bits.append(f"{b['invites']} challenge(s) waiting")
+    if b.get("your_turn"):
+        bits.append(f"{b['your_turn']} battle(s) where it is the student's turn")
+    if bits:
+        print("Battles: " + ", ".join(bits))
+
+
 def cmd_sync(a):
     st = load_state() or sys.exit("Not set up. Run optin first.")
     with open(a.file) as f:
@@ -106,12 +118,15 @@ def cmd_sync(a):
         })
     res = call("/api/skill/grades", {"items": out}, st["token"])
     print(f"Points +{res['points']}, Mana +{res['mana']}, Shields +{res.get('shields', 0)}")
+    battles_line(res)
     print(res["link"])
 
 
 def cmd_link(a):
     st = load_state() or sys.exit("Not set up. Run optin first.")
-    print(call("/api/skill/link", {}, st["token"])["link"])
+    res = call("/api/skill/link", {}, st["token"])
+    battles_line(res)
+    print(res["link"])
 
 
 def cmd_leave(a):
